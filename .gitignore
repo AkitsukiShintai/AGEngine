@@ -1,0 +1,41 @@
+.vs
+*.filters
+*.user
+
+x64Debug
+# Compiled Object files
+Debug
+Release
+*.tlog
+*.log
+*.idb
+*.iobj
+*.ipdb
+*.pdb
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+
+# Executables
+*.exe
+*.out
+*.app
+*.filters
