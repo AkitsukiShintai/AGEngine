@@ -26,6 +26,8 @@ public:
 
 	void Draw(const Mesh& mesh, VertexInputFlags inputData, uint32_t instantCount, uint32_t firstIndex = 0, uint32_t vertexOffset = 0, uint32_t firstInstance = 0, VkIndexType indexType = VK_INDEX_TYPE_UINT32);
 
+	void Draw(const Buffer& vertexbuffer, const Buffer& indexbuffer, uint32_t vertexCount, uint32_t instanceCount = 1, VkIndexType indexType = VK_INDEX_TYPE_UINT32);
+
 	void TransitionImageLayout(GraphicsImage& image, VkImageLayout newLayout, VkImageSubresourceRange subSourceRange = { VK_IMAGE_ASPECT_COLOR_BIT ,0,1,0,1 });
 
 	void EndRenderpass();

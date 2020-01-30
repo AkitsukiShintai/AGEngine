@@ -25,7 +25,7 @@ Descriptor::Descriptor(const Buffer& buffer, uint32_t binding) {
 	descriptorWrites.descriptorType = (buffer.usage & VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT) != 0 ? VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER : VK_DESCRIPTOR_TYPE_STORAGE_BUFFER;
 	descriptorWrites.descriptorCount = 1;
 	bufferInfo.buffer = buffer.handle;
-	bufferInfo.offset = buffer.allocationInfo.offset;
+	bufferInfo.offset = 0;
 	bufferInfo.range = buffer.accurateSize;
 
 	descriptorWrites.pBufferInfo = &bufferInfo;

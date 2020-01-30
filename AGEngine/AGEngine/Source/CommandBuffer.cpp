@@ -39,6 +39,10 @@ void CommandBuffer::BeginRenderpass(const RenderPass& renderpass, const Framebuf
 
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = renderpass.renderArea;
+	if (renderPassInfo.renderArea.extent.height == 0 || renderPassInfo.renderArea.extent.height == 0)
+	{
+		throw std::runtime_error("render eare 0!");
+	}
 
 	renderPassInfo.clearValueCount = renderpass.clearColors.size();
 	renderPassInfo.pClearValues = renderpass.clearColors.data();
@@ -81,6 +85,13 @@ void CommandBuffer::Draw(const Mesh& mesh, VertexInputFlags inputData, uint32_t 
 	vkCmdBindVertexBuffers(commandBuffer, 0, vertexBuffers.size(), vertexBuffers.data(), offsets.data());
 	vkCmdBindIndexBuffer(commandBuffer, mesh.indexBuffer.handle, 0, indexType);
 	vkCmdDrawIndexed(commandBuffer, mesh.indexCount, instantCount, firstIndex, vertexOffset, firstInstance);
+}
+void CommandBuffer::Draw(const Buffer& vertexbuffer, const Buffer& indexbuffer, uint32_t vertexCount, uint32_t instanceCount,VkIndexType indexType)
+{
+	VkDeviceSize offset = 0;
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, &vertexbuffer.handle, &offset);
+	vkCmdBindIndexBuffer(commandBuffer, indexbuffer.handle, 0, indexType);
+	vkCmdDraw(commandBuffer, vertexCount, instanceCount, 0, 0);
 }
 void CommandBuffer::TransitionImageLayout(GraphicsImage& image, VkImageLayout newLayout, VkImageSubresourceRange subSourceRange)
 {

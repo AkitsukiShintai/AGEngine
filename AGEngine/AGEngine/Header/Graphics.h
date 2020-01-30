@@ -111,8 +111,7 @@ public:
 	size_t currentFrame = 0;
 
 	std::vector<BufferUpdateCallback> bufferUpdateCallbacks;
-	std::vector<MouseUpdateCallback> mouseUpdateCallbacks;
-
+	
 	void Init();
 
 	uint32_t FindMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);

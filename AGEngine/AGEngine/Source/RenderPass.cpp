@@ -1,9 +1,10 @@
 #include "PCH.h"
 #include <RenderPass.h>
 #include <Graphics.h>
-RenderPass::RenderPass(uint32_t attachmentCount) :renderpass(VK_NULL_HANDLE) {
+RenderPass::RenderPass(uint32_t attachmentCount,VkExtent2D _renderarea) :renderpass(VK_NULL_HANDLE) {
 	device = Graphics::GetInstance()->device;
 	attachments.resize(attachmentCount);
+	renderArea = _renderarea;
 }
 
 VkAttachmentDescription RenderPass::CreateAttachmentDescriptionForDepthAttachment(
@@ -117,5 +118,10 @@ void RenderPass::CreateRenderPass() {
 void RenderPass::SetClearColor(std::vector<VkClearValue> _clearColors)
 {
 	clearColors = _clearColors;
+}
+
+void RenderPass::SetRenderArea(VkExtent2D area)
+{
+	renderArea = area;
 }
 

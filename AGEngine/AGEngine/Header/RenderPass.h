@@ -17,7 +17,7 @@ public:
 	RenderPass(const RenderPass& a) = delete;
 	RenderPass& operator=(const RenderPass&) = delete;
 
-	RenderPass(uint32_t attachmentCount);
+	RenderPass(uint32_t attachmentCount, VkExtent2D renderArea);
 	std::vector<SubpassDescription> subpasses;
 	std::vector<VkAttachmentDescription> attachments;
 	std::vector<VkSubpassDependency> subpassDependencies;
@@ -55,4 +55,5 @@ public:
 
 	void SetClearColor(std::vector<VkClearValue> _clearColors);
 
+	void SetRenderArea(VkExtent2D area);
 };

@@ -49,3 +49,4 @@
 #include <Structs.h>
 #include <Define.h>
 #include <Enum.h>
+#include <HelpFunctions.h>

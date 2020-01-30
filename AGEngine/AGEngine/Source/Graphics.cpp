@@ -1,8 +1,6 @@
 #include <PCH.h>
 #include <Graphics.h>
-
-POINT mouseLastPos;
-POINT mouseCurrentPos;
+#include <Window.h>
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL DefaultDebugCallback(
 	VkDebugUtilsMessageSeverityFlagBitsEXT m_essageSeverity,
@@ -20,6 +18,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL DefaultDebugCallback(
 
 static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
+	Window::GetInstance()->OnWindowInput(hWnd, msg, wParam, lParam);
 	Graphics* g = Graphics::GetInstance();
 	switch (msg)
 	{
@@ -63,14 +62,11 @@ static LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 			break;
 		}
 		return 0;
+	case WM_KEYUP:
+		
 	case WM_SETCURSOR:	case WM_DEVICECHANGE:
 	case WM_MOUSEMOVE:
-		mouseLastPos = mouseCurrentPos;
-		GetCursorPos(&mouseCurrentPos);
-		for (auto t : g->mouseUpdateCallbacks)
-		{
-			t(mouseCurrentPos.x - mouseLastPos.x, mouseCurrentPos.y - mouseLastPos.y);
-		}
+	
 	default:
 		break;
 	}
@@ -1037,15 +1033,15 @@ void Graphics::CopyDataToGUPBuffer(void* data, Buffer& buffer, size_t size, size
 }
 void Graphics::CopyDataToBuffer(void* data, Buffer& buffer, size_t size, size_t offset)
 {
-	memcpy(buffer.allocationInfo.pMappedData, data, size);
+	memcpy((char*)buffer.allocationInfo.pMappedData+offset, data, size);
 }
 void Graphics::CmdCopyBufferToBuffer(VkCommandBuffer cmd, Buffer srcBuffer, Buffer dstBuffer)
 {
 
 	VkBufferCopy copyRegion = {};
-	copyRegion.size = srcBuffer.allocationInfo.size;
-	copyRegion.srcOffset = srcBuffer.allocationInfo.offset;
-	copyRegion.dstOffset = dstBuffer.allocationInfo.offset;
+	copyRegion.size = srcBuffer.accurateSize;
+	copyRegion.srcOffset = 0;
+	copyRegion.dstOffset = 0;
 	vkCmdCopyBuffer(cmd, srcBuffer.handle, dstBuffer.handle, 1, &copyRegion);
 }
 

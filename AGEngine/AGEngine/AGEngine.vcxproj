@@ -71,9 +71,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SolutionDir)Include\GLFW;$(IncludePath);$(ProjectDir)Header;%(AdditionalIncludeDirectories);$(SolutionDir)Include;$(SolutionDir)Include\glm;$(VK_SDK_PATH)\Include;$(SolutionDir)Include\VulkanMemoryAllocator;$(SolutionDir)Include\ShaderC</IncludePath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)Include\GLFW;$(IncludePath);$(ProjectDir)Header;%(AdditionalIncludeDirectories);$(SolutionDir)Include;$(SolutionDir)Include\glm;$(VK_SDK_PATH)\Include;$(SolutionDir)Include\VulkanMemoryAllocator;$(SolutionDir)Include\ShaderC;$(SolutionDir)Include\assimp</IncludePath>
+    <OutDir>$(SolutionDir)$(Configuration)\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,6 +150,7 @@
     <ClInclude Include="Header\FrameBuffer.h" />
     <ClInclude Include="Header\FShaderCompiler.h" />
     <ClInclude Include="Header\Graphics.h" />
+    <ClInclude Include="Header\HelpFunctions.h" />
     <ClInclude Include="Header\Mesh.h" />
     <ClInclude Include="Header\Pipeline.h" />
     <ClInclude Include="Header\RenderPass.h" />
@@ -155,8 +158,10 @@
     <ClInclude Include="Header\Singleton.h" />
     <ClInclude Include="Header\PCH.h" />
     <ClInclude Include="Header\Structs.h" />
+    <ClInclude Include="Header\FrameTime.h" />
     <ClInclude Include="Header\vk_mem_alloc.h" />
     <ClInclude Include="Header\VmaUsage.h" />
+    <ClInclude Include="Header\Window.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\CommandBuffer.cpp" />
@@ -172,7 +177,9 @@
     <ClCompile Include="Source\Pipeline.cpp" />
     <ClCompile Include="Source\RenderPass.cpp" />
     <ClCompile Include="Source\Sampler.cpp" />
+    <ClCompile Include="Source\FrameTime.cpp" />
     <ClCompile Include="Source\VmaUsage.cpp" />
+    <ClCompile Include="Source\Window.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

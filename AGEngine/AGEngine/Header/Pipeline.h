@@ -26,7 +26,7 @@ public:
 
 	VkPipelineLayout pipelineLayout;
 	VkPipeline pipeline;
-
+	bool setDepth;
 public:
 	Pipeline(const Pipeline& a) = delete;
 	Pipeline& operator=(const Pipeline&) = delete;
@@ -55,4 +55,5 @@ public:
 
 	void CreatePipeline(const RenderPass& renderPass);
 
+	void SetDepthStencilState(bool depthTestEnable, bool stencilTestEnable, bool depthWriteEnable, VkCompareOp depthCompareOp, bool depthBoundsTest = false);
 };

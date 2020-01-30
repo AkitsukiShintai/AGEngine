@@ -275,7 +275,7 @@ void Pipeline::CreatePipeline(const RenderPass& renderPass)
 	VkPipelineDynamicStateCreateInfo dynamicState = {};
 	dynamicState.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
 	dynamicState.dynamicStateCount = dynamicStates.size();
-	dynamicState.pDynamicStates = dynamicStates.data();
+	dynamicState.pDynamicStates = dynamicStates.size() == 0? VK_NULL_HANDLE : dynamicStates.data();
 
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo = {};
 	pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -304,9 +304,7 @@ void Pipeline::CreatePipeline(const RenderPass& renderPass)
 	pipelineInfo.pViewportState = &viewportState;
 	pipelineInfo.pRasterizationState = rasterizers.data();
 	pipelineInfo.pMultisampleState = multisamplings.data();
-	pipelineInfo.pDepthStencilState = nullptr; // Optional
-
-	pipelineInfo.pDepthStencilState = &depthInfo;
+	pipelineInfo.pDepthStencilState = setDepth == true ? &depthInfo : nullptr;
 
 	pipelineInfo.pColorBlendState = &colorBlendingCreateInfo;
 	pipelineInfo.pDynamicState = &dynamicState; // Optional
@@ -328,3 +326,16 @@ void Pipeline::CreatePipeline(const RenderPass& renderPass)
 	}
 
 }
+
+void Pipeline::SetDepthStencilState(bool depthTestEnable, bool stencilTestEnable, bool depthWriteEnable, VkCompareOp depthCompareOp, bool depthBoundsTest)
+{
+	setDepth = true;
+	depthInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+	depthInfo.depthBoundsTestEnable = depthBoundsTest;
+	depthInfo.depthCompareOp = depthCompareOp;
+	depthInfo.depthTestEnable = depthTestEnable;
+	depthInfo.stencilTestEnable = stencilTestEnable;
+	depthInfo.depthWriteEnable = depthWriteEnable;
+	depthInfo.maxDepthBounds = 1.0f;
+	depthInfo.minDepthBounds = 0.0f;
+};
