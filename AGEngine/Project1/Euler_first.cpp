@@ -1,4 +1,4 @@
-#define EULER_FIRST
+//#define EULER_FIRST
 #ifdef EULER_FIRST
 #include <iostream>
 #include <iomanip>
