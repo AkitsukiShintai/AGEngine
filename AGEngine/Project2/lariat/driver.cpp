@@ -882,7 +882,10 @@ void run_scenario_cmp_to_vector // for correctess
                 break;
         }
 
-        
+        if (lar.size() != lar.head_->count + (lar.head_ == lar.tail_?0:lar.tail_->count))
+        {
+			std::cout << "values differ: lar[" << std::endl;
+        }
         //compare lar and v after each operation
         if ( lar.size() == v.size () ) {
             for( unsigned i=0; i<lar.size(); ++i ) {
@@ -1123,8 +1126,7 @@ int main(int argc, char *argv[] ) {
             std::cerr << msg << std::endl;
         }
     }*/
-	test0();
-	test2();
-
+	
+	test16();
     return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "Grid.h"
+#include <complex>
 template<class T>
 glm::vec2 frequencyVector(const Grid<T>& B, int p, int q) {
 	assert(p >= 0 && p <= B.cellWidth());
@@ -31,4 +32,42 @@ glm::vec2 frequencyVector(const Grid<T>& B, int p, int q) {
 	}
 
 	return result;
+}
+
+template<class R>
+class FFT2 {
+	FFT_base<R> w;
+	FFT_base<R> h;
+public:
+	FFT2(int lgW, int lgH);
+	~FFT2();
+	void operator()(Grid < std::complex<R>> & A);
+
+};
+
+template<class R>
+FFT2<R>::FFT2(int lgW, int lgH):w(lgW,false), h(lgH, false)
+{
+
+}
+
+template<class R>
+FFT2<R>::~FFT2()
+{
+}
+template<class R>
+void FFT2<R>::operator()(Grid < std::complex<R>> & A) {
+	std::vector<R> arr;
+	arr.resize(A.cellWidth());
+	for (int i = 0; i <A.cellHeight(); i ++)
+	{
+		for (int j = 0; j < A.cellWidth(); j++)
+		{
+			arr[j] = A(i, j);
+		}
+		w(arr[0]);
+
+	}
+	
+
 }
