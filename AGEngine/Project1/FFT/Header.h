@@ -57,17 +57,82 @@ FFT2<R>::~FFT2()
 }
 template<class R>
 void FFT2<R>::operator()(Grid < std::complex<R>> & A) {
-	std::vector<R> arr;
+	std::vector<std::complex<R>> arr;
 	arr.resize(A.cellWidth());
 	for (int i = 0; i <A.cellHeight(); i ++)
 	{
 		for (int j = 0; j < A.cellWidth(); j++)
 		{
+			arr[j] = A(j, i);
+		}
+		w(&arr[0]);
+		for (int j = 0; j < A.cellWidth(); j++)
+		{
+			A(j, i) = arr[j];
+		}
+	}
+	arr.resize(A.cellHeight());
+	for (int i = 0; i < A.cellWidth(); i++)
+	{
+		for (int j = 0; j < A.cellHeight(); j++)
+		{
 			arr[j] = A(i, j);
 		}
-		w(arr[0]);
-
+		w(&arr[0]);
+		for (int j = 0; j < A.cellHeight(); j++)
+		{
+			A(i, j) = arr[j];
+		}
 	}
-	
+}
 
+template<class R>
+class IFFT2 {
+	FFT_base<R> w;
+	FFT_base<R> h;
+public:
+	IFFT2(int lgW, int lgH);
+	~IFFT2();
+	void operator()(Grid < std::complex<R>>& A);
+};
+
+template<class R>
+IFFT2<R>::IFFT2(int lgW, int lgH) :w(lgW, true), h(lgH, true)
+{
+
+}
+
+template<class R>
+IFFT2<R>::~IFFT2()
+{
+}
+template<class R>
+void IFFT2<R>::operator()(Grid < std::complex<R>>& A) {
+	std::vector<std::complex<R>> arr;
+	arr.resize(A.cellWidth());
+	for (int i = 0; i < A.cellHeight(); i++)
+	{
+		for (int j = 0; j < A.cellWidth(); j++)
+		{
+			arr[j] = A(j, i);
+		}
+		w(&arr[0]);
+		for (int j = 0; j < A.cellWidth(); j++)
+		{
+			A(j, i) = arr[j];
+		}
+	}
+	arr.resize(A.cellHeight());
+	for (int i = 0; i < A.cellWidth(); i++)
+	{
+		for (int j = 0; j < A.cellHeight(); j++)
+		{
+			arr[j] = A(i, j);
+		}
+		w(&arr[0]);
+		for (int j = 0; j < A.cellHeight(); j++)
+		{
+			A(i, j) = arr[j];
+		}
+	}
 }
