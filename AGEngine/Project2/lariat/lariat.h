@@ -79,6 +79,7 @@ public:
 	size_t size(void) const;   // total number of items (not nodes)
 	void clear(void);          // make it empty
 	void compact();             // push data in front reusing empty positions and delete remaining nodes
+	bool Check();
 public:
 	template<typename U, int Size2>  //[nested template declaration]
 	friend class Lariat;
@@ -191,7 +192,7 @@ void Lariat<T, Size>::insert(int index, const T& value)
 		{
 			tail_ = node->next;
 		}
-	}
+ 	}
 	else
 	{
 		//move all right value
@@ -283,9 +284,11 @@ void Lariat<T, Size>::pop_back()
 		}
 		else
 		{
+			LNode* node = tail_;
 			tail_ = tail_->prev;
-			delete tail_->next;
 			tail_->next = nullptr;
+			delete node;
+			
 		}
 	}
 
@@ -300,16 +303,24 @@ void Lariat<T, Size>::pop_front()
 		return;
 	}
 	ShiftDown(head_, 0);
+	head_->count--;
 	if (head_->count == 0)
 	{
-		delete head_;
-		head_ = nullptr;
-		tail_ = nullptr;
-	}
-	else
-	{
-		head_->count--;
-	}
+		
+		if (tail_ != head_)
+		{
+			LNode* h = head_;
+			head_ = head_->next;
+			delete h;
+		}
+		else
+		{
+			delete head_;
+			head_ = nullptr;
+			tail_ = nullptr;
+		}
+		
+	}	
 	size_--;
 }
 
@@ -382,16 +393,17 @@ void Lariat<T, Size>::clear()
 
 template<typename T, int Size>
 void Lariat<T, Size>::compact()
-{
+ {
 	if (head_ == nullptr)
 	{
 		return;
 	}
-
+	//std::cout << *this << std::endl;
 	LNode* insertNode = head_;
 	LNode* nextValueNode = head_;
 	int localIndexOfInsertNode = 0;
 	int localIndexOfNextValue = 0;
+	int deadCount = 0;
 	//find first insert position
 	while (insertNode != nullptr) {
 		if (insertNode->count < asize_)
@@ -403,8 +415,8 @@ void Lariat<T, Size>::compact()
 		}
 		insertNode = insertNode->next;
 	}
-
-	while (nextValueNode != nullptr)
+	
+	while (nextValueNode != nullptr && insertNode != nullptr)
 	{
 		if (insertNode != nextValueNode)
 		{
@@ -419,31 +431,113 @@ void Lariat<T, Size>::compact()
 				localIndexOfInsertNode = 0;
 			}
 
+
 			localIndexOfNextValue++;
 			if (localIndexOfNextValue == nextValueNode->count)
 			{
+				nextValueNode->count = 0;
 				nextValueNode = nextValueNode->next;
 				localIndexOfNextValue = 0;
 			}
 
 		}
-		
+		else
+		{
+			if (localIndexOfInsertNode == 0)
+			{
+				deadCount = insertNode->count;
+				insertNode->count = insertNode->count - localIndexOfNextValue;
+			}
+			insertNode->values[localIndexOfInsertNode] = nextValueNode->values[localIndexOfNextValue];
+			
+			//check if need to jump to next node
+			localIndexOfInsertNode++;
+			if (localIndexOfInsertNode == asize_)
+			{
+				insertNode = insertNode->next;
+				localIndexOfInsertNode = 0;
+			}
+
+			localIndexOfNextValue++;
+			if (localIndexOfNextValue == deadCount)
+			{
+				nextValueNode = nextValueNode->next;
+				localIndexOfNextValue = 0;
+				deadCount = 0;
+			}
+		}
 
 	}
-	LNode* deleteNode = insertNode->next;
-	insertNode->next = nullptr;
+	
+	LNode* deleteNode = head_;
+	while (deleteNode != nullptr && deleteNode->count > 0)
+	{
+		deleteNode = deleteNode ->next;
+	}
 	if (deleteNode == nullptr)
 	{
 		return;
 	}
-	while (deleteNode != nullptr)
+	if (deleteNode->prev != nullptr)//the node is not head
 	{
-		LNode* deleteNodet = deleteNode;
-		deleteNode = deleteNodet->next;
-		delete deleteNodet;
+		deleteNode->prev->next = nullptr;
+		tail_ = deleteNode->prev;
+
+		while (deleteNode != nullptr)
+		{
+			LNode* deleteNodet = deleteNode;
+			deleteNode = deleteNodet->next;
+			delete deleteNodet;
+		}
+
+	}
+	else
+	{
+		delete head_;
+		head_ = nullptr;
+		tail_ = nullptr;
+	}
+	
+	
+}
+
+template<typename T, int Size>
+bool Lariat<T, Size>::Check()
+{
+	if (head_ == nullptr )
+	{
+		return true;
+	}
+	if (head_ -> prev != nullptr)
+	{
+		return false;
 	}
 
-	tail_ = insertNode;
+	if (tail_->next != nullptr)
+	{
+		return false;
+	}
+
+	if (head_ == tail_ )
+	{
+		return true;
+	}
+	int cont = 0;
+	LNode* h = head_;
+	while (h != nullptr)
+	{
+		LNode* next = h->next;
+		if (next != nullptr)
+		{
+			if (next->prev != h)
+			{
+				return false;
+			}
+		
+		}
+		h = next;
+	}
+	return true;
 }
 
 template<typename T, int Size>
@@ -491,7 +585,7 @@ template<typename T, int Size>
 unsigned Lariat<T, Size>::find(const T& value) const
 {
 	LNode* node = head_;
-	unsigned index = 0;
+	int index = 0;
 	while (node != nullptr)
 	{
 		for (int i = 0; i < node->count; i++)
@@ -517,7 +611,7 @@ template<typename T, int Size>
 typename Lariat<T, Size>::LNode* Lariat<T, Size>::findNodeAndLoacalIndex(int index, int& localIndex)
 {
 
-	if (index > size_ || index < 0)
+	if (index >= size_ || index < 0)
 	{
 		throw LariatException(LariatException::E_BAD_INDEX, "Subscript is out of range");
 	}
@@ -526,17 +620,18 @@ typename Lariat<T, Size>::LNode* Lariat<T, Size>::findNodeAndLoacalIndex(int ind
 	while (temp <= index)
 	{
 		temp += node->count;
+		if (temp > index)
+		{
+			localIndex = node->count - (temp - index);
+			return node;
+		}
 		node = node->next;
 	}
 	if (node == nullptr)
 	{
 		node = tail_;
 	}
-	else
-	{
-		node = node->prev;
-	}
-	
+
 	localIndex = node->count - (temp - index);
 	return node;
 
@@ -601,7 +696,9 @@ void Lariat<T, Size>::Split(LNode* node, const T& value, int localIndex)
 	newNode->prev = node;
 	if (node->next != nullptr)
 	{
+		node->next->prev = newNode;
 		newNode->next = node->next;
+
 	}
 	node->next = newNode;
 	if (localIndex > mid)//value should be inserted in next node
