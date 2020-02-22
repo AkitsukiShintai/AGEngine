@@ -11,7 +11,6 @@ class Window:public Singleton <Window>{
 	static void MouseMove(GLFWwindow* window, double xpos, double ypos);
 	static void ScrollInput(GLFWwindow* window, double xoffset, double yoffset);
 	static void WindowClose(GLFWwindow* window);
-	static void WindowSizeChange(GLFWwindow* window,int w, int h);
 	const static int keySize = 300;
 	 char keyState[keySize];
 	 char prevKeyState[keySize];
