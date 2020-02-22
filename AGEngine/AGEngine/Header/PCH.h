@@ -3,16 +3,14 @@
 #pragma comment (lib, "gdi32.lib") 
 #define VK_USE_PLATFORM_WIN32_KHR
 
-#define GLFW
 #ifdef GLFW
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#include <GLFW/glfw3native.h>
+	#define GLFW_INCLUDE_VULKAN
+	#include <glfw3.h>
 #endif
 //#include <glfw3native.h>
 #define STB_IMAGE_IMPLEMENTATION
 //#include <stb_image.h>
-#include <Template/Singleton.h>
+#include <Singleton.h>
 #include <string>
 #include <filesystem>
 #include <iostream>
@@ -44,10 +42,10 @@
 #include <assimp/scene.h>           // Output data structure
 #include <assimp/postprocess.h>     // Post processing flags
 
-#include <Graphics/VmaUsage.h>
-#include <Graphics/Common.h>
+#include <VmaUsage.h>
+#include <Common.h>
 
-#include <Graphics/CompilerHelpFunction.h>
+#include <CompilerHelpFunction.h>
 #include <Structs.h>
 #include <Define.h>
 #include <Enum.h>

@@ -42,15 +42,10 @@
 #define  DEPTH_ATTACHMENT_FORMAT VK_FORMAT_D32_SFLOAT_S8_UINT
 #define DATA_ATTACHMENT_FORMAT VK_FORMAT_R32G32B32A32_SFLOAT
 
-//timer
 using Elapsed = std::chrono::duration<float, std::milli>;
 using Clock = std::chrono::high_resolution_clock;
 using TimePoint = std::chrono::high_resolution_clock::time_point;
 
-//graphics callback
 using BufferUpdateCallback = void (*)();
-
-//mouse and keyboard update
 using MouseUpdateCallback = void (*)(glm::vec2);
 using KeyUpdateCallback = void (*)();
-

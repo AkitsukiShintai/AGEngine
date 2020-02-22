@@ -1,7 +1,14 @@
 #include <PCH.h>
-#include <Graphics//Window.h>
-#include <GraphicsHeader.h>
-#include <System/FrameTime.h>
+#include <Graphics.h>
+#include <RenderPass.h>
+#include <Pipeline.h>
+#include <Framebuffer.h>
+#include <CommandBuffer.h>
+#include <Mesh.h>
+#include <Descriptor.h>
+#include <DescriptorSet.h>
+#include <Window.h>
+#include <FrameTime.h>
 static POINT mouseLastPos;
 static POINT mouseCurrentPos;
 
@@ -28,7 +35,7 @@ void scroll_callback(double xoffset, double yoffset)
 		fov = 110.0f;
 }
 
-void MouseCallback (glm::vec2 delta) {
+static void MouseCallback (glm::vec2 delta) {
 	//std::cout << "delta " << delta.x << " " << delta.y << std::endl;
 	float xoffset = delta.x;
 	float yoffset = delta.y; // 注意这里是相反的，因为y坐标的范围是从下往上的
@@ -50,22 +57,21 @@ void MouseCallback (glm::vec2 delta) {
 	cameraDir = glm::normalize(front);
 }
 
-void KeyCallback(Window* window) {
+static void KeyCallback() {
+	Window* window = Window::GetInstance();
 	float cameraSpeed = 5.0f * FrameTime::GetInstance()->DeltaTime();
-	if (window->IsPressed(GLFW_KEY_W)) {
+	if (window->IsPressed(VK_W)) {
 		std::cout << "w" << std::endl;
 		cameraPosition += cameraSpeed * cameraDir;
 	}		
-	if (window->IsPressed(GLFW_KEY_S))
+	if (window->IsPressed(VK_S))
 		cameraPosition -= cameraSpeed * cameraDir;
-	if (window->IsPressed(GLFW_KEY_A))
+	if (window->IsPressed(VK_A))
 		cameraPosition -= glm::normalize(glm::cross(cameraDir, up)) * cameraSpeed;
-	if (window->IsPressed(GLFW_KEY_D))
+	if (window->IsPressed(VK_D))
 		cameraPosition += glm::normalize(glm::cross(cameraDir, up)) * cameraSpeed;
-	if (window->IsTriggered(GLFW_KEY_P))
+	if (window->IsTriggered(VK_P))
 		Print(cameraPosition,"camera position");
-	if (window->IsReleased(GLFW_KEY_P))
-		Print(cameraPosition, "camera position");
 }
 void UpdateCameraData() {
 	Graphics* g_Graphics = Graphics::GetInstance();
@@ -89,22 +95,22 @@ void main() {
 
 
 	//window->mouseUpdateCallbacks.push_back(MouseCallback);
-	window->inputCallback.push_back(KeyCallback);
+	window->keyUpdateCallbacks.push_back(KeyCallback);
 	g_Graphics->bufferUpdateCallbacks.push_back(UpdateCameraData);
 
-	window->width = 720;
-	window->height = 720;
-	window->applicationName = "AGEngine";
-	window->Init();
+	g_Graphics->width = 720;
+	g_Graphics->height = 720;
+	g_Graphics->applicationName = "AGEngine";
 	g_Graphics->Init();
+
 
 	//
 	std::vector<glm::vec2> vertexes{ {1,0},{0,1},{0,0} };
 	uint32_t index[3] = { 0,1,2 };
-	Buffer triangleVertexBuffer = g_Graphics->CreateBuffer(sizeof(vertexes), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
-	Buffer triangleIndexBuffer = g_Graphics->CreateBuffer(sizeof(index), VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
-	g_Graphics->CopyDataToGUPBuffer(vertexes.data(), triangleVertexBuffer, sizeof(vertexes));
-	g_Graphics->CopyDataToGUPBuffer(index, triangleIndexBuffer, sizeof(index));
+	Buffer vertexBuffer = g_Graphics->CreateBuffer(sizeof(vertexes), VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
+	Buffer indexBuffer = g_Graphics->CreateBuffer(sizeof(index), VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT, VMA_MEMORY_USAGE_GPU_ONLY);
+	g_Graphics->CopyDataToGUPBuffer(vertexes.data(), vertexBuffer, sizeof(vertexes));
+	g_Graphics->CopyDataToGUPBuffer(index, indexBuffer, sizeof(index));
 	//
 
 
@@ -115,7 +121,7 @@ void main() {
 	g_Graphics->CreateVertexBuffer(plane);
 	g_Graphics->CreateIndexBuffer(plane);
 
-	GraphicsImage renderTarget = g_Graphics->CreateImage(window->width, window->height, g_Graphics->swapChainImageFormat, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
+	GraphicsImage renderTarget = g_Graphics->CreateImage(g_Graphics->width, g_Graphics->height, g_Graphics->swapChainImageFormat, VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_TRANSFER_SRC_BIT);
 	g_Graphics->CreateImageView(renderTarget, g_Graphics->swapChainImageFormat);
 	g_Graphics->TransitionImageLayout(renderTarget, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL);
 
@@ -157,14 +163,29 @@ void main() {
 	CommandBuffer renderCommand = g_Graphics->CreateCommandBuffer(false,true);
 	renderCommand.BeginRenderpass(defaultpass, framebuffer);
 	renderCommand.BeginPipeline(defaultPipeline, defaultpass, descriptorSet);
-	renderCommand.Draw(triangleVertexBuffer,triangleIndexBuffer, 3, 1);
+	renderCommand.Draw(vertexBuffer,indexBuffer, 3, 1);
 	//renderCommand.Draw(plane, k_Position, 1);
 	MSG msg;
-	while (!window->close) {
+	while (!Graphics::GetInstance()->close) {
 		framControl->FrameStart();
-		window->Update();		
+		window->Update();
+		window->UpdateMousePos(g_Graphics->winWindowHandle);
+		if (PeekMessage(&msg, g_Graphics->winWindowHandle, 0, 0, PM_REMOVE))
+		{
+			if (msg.message != WM_IME_SELECT)
+			{
+				TranslateMessage(&msg);
+				DispatchMessage(&msg);
+				
+			}
+			else
+			{
+				std::cout << "change" << std::endl;
+			}	
+		}
+		window->CallUpdateCallbacks();
 		g_Graphics->DrawFrameAndPresent({ &renderCommand }, renderTarget);
 		framControl->FrameEnd();
 	}
-	window->Clear();
+	
 }

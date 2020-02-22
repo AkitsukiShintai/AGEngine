@@ -129,11 +129,8 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="FFT\FFT.h" />
-    <ClInclude Include="FFT\FFT2.h" />
     <ClInclude Include="FFT\Grid.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="FFT\main.cpp" />
+    <ClInclude Include="FFT\Header.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
