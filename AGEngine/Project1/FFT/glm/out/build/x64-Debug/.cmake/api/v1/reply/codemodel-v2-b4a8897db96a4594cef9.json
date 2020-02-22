@@ -1,0 +1,64 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "Project",
+					"targetIndexes" : 
+					[
+						0,
+						1
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "glm_shared::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm_shared-Debug-9a99ab3bc81c671713bc.json",
+					"name" : "glm_shared",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "glm_static::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-glm_static-Debug-9d35993397fef452f64e.json",
+					"name" : "glm_static",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "F:/AGEngine/AGEngine/Include/glm/out/build/x64-Debug",
+		"source" : "F:/AGEngine/AGEngine/Include/glm"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 0
+	}
+}
