@@ -82,8 +82,9 @@ void UpdateCameraData() {
 
 
 void main() {
-	Graphics* g_Graphics = Graphics::GetInstance();
 	Window* window = Window::GetInstance();
+	Graphics* g_Graphics = Graphics::GetInstance();
+	
 	FrameTime* framControl = FrameTime::GetInstance();
 
 

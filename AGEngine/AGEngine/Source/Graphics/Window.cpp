@@ -5,7 +5,10 @@ void Window::Init()
 {
 #ifdef GLFW
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+	glfwWindowHint(GLFW_AUTO_ICONIFY, GLFW_TRUE);
+	glfwWindowHint(GLFW_FLOATING, GLFW_TRUE);
+
 	window = glfwCreateWindow(width, height, applicationName.c_str(), nullptr, nullptr);
 	glfwSetWindowUserPointer(window, this);
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
@@ -15,7 +18,8 @@ void Window::Init()
 	glfwSetScrollCallback(window, ScrollInput);
 	glfwSetWindowCloseCallback(window, WindowClose);
 	glfwSetWindowAspectRatio(window, 16, 9);
-	//glfwMaximizeWindow(window);
+	glfwSetWindowSizeCallback(window, WindowSizeChange);
+	glfwShowWindow(window);
 #else
 	HINSTANCE g_hAppInstance = (HINSTANCE)GetModuleHandle(NULL);
 
@@ -98,6 +102,13 @@ void Window::WindowClose(GLFWwindow* window)
 {
 	Window* myWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
 	myWindow->close = true;
+}
+
+void Window::WindowSizeChange(GLFWwindow* window, int w, int h)
+{
+	Window* myWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	myWindow->width = w;
+	myWindow->height = h;
 }
 
 void Window::Update() {
